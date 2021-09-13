@@ -9,9 +9,12 @@
 #include "ds3231.h"
 #include "bme680.h"
 #include "http_request.h"
+#include "bluetooth.h"
 
 const char* TAG = "main";
 int flag_server_request = 0;
+int flag_bl_send = 0;
+int flag_led_indication = 1;
 
 
 #define DS3231_I2C_SDA_PIN 19
@@ -79,6 +82,8 @@ void app_main(void)
 
 	//start wifi
 	wifi_start();
+	//bluetooth
+	bluetooth_init();
 
 	//ds3231
 	ESP_ERROR_CHECK(i2cdev_init());
@@ -119,6 +124,13 @@ void app_main(void)
 			bme680_values.temperature, bme680_values.pressure,
 			bme680_values.humidity);
 		}
+		//send data over bluetooth
+		if(flag_bl_send == 1){
+			get_time_string(time_string);
+			write_data(time_string, 0.0, 0.0, bme680_values.temperature,
+					bme680_values.pressure, bme680_values.humidity, mhz19b_co2, 0, 0);
+			flag_bl_send = 0;
+			}
 		//time delay between measuring
 		vTaskDelay(5000 / portTICK_PERIOD_MS);
 		}
