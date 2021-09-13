@@ -1,11 +1,15 @@
 #include <stdio.h>
-#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_log.h"
 
+#include "driver/gpio.h"
+#include "wifi.h"
 
 
 void app_main(void)
 {
-	gpio_set_direction(2, GPIO_MODE_OUTPUT);
-	gpio_set_level(2, 1);
+	//start wifi
+	wifi_start();
 
 }
