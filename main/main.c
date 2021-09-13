@@ -38,7 +38,39 @@ void bme680_get_data(bme680_t sensor, uint32_t duration, bme680_values_float_t* 
 	}
 }
 
+void get_time_string(char* line){
 
+	char temp_line[30];
+	char string_value[15];
+	//get time from esp32
+	struct timeval temp_time_timeval;
+	gettimeofday(&temp_time_timeval, NULL);
+	time_t temp_time_time_t = temp_time_timeval.tv_sec;
+	struct tm esp32_time_tm;
+	localtime_r(&temp_time_time_t, &esp32_time_tm);
+	//create time string in right format
+	sprintf(string_value, "%d",esp32_time_tm.tm_year+1900);
+	strcpy(temp_line,string_value);
+	strcat(temp_line, "-");
+	sprintf(string_value, "%d",esp32_time_tm.tm_mon);
+	strcat(temp_line,string_value);
+	strcat(temp_line, "-");
+	sprintf(string_value, "%d",esp32_time_tm.tm_mday);
+	strcat(temp_line,string_value);
+	strcat(temp_line, "T");
+	sprintf(string_value, "%d",esp32_time_tm.tm_hour);
+	strcat(temp_line,string_value);
+	strcat(temp_line, ":");
+	sprintf(string_value, "%d",esp32_time_tm.tm_min);
+	strcat(temp_line,string_value);
+	strcat(temp_line, ":");
+	sprintf(string_value, "%d",esp32_time_tm.tm_sec);
+	strcat(temp_line,string_value);
+	strcat(temp_line, "Z");
+
+	strcpy(line, temp_line);
+	ESP_LOGI("get_time_string", "[APP] String %s",line);
+}
 
 void app_main(void)
 {
@@ -82,7 +114,8 @@ void app_main(void)
 		ESP_LOGI(TAG, "humidity = %d\n", (int)bme680_values.humidity);
 		//send data to server
 		if(flag_server_request == 1){
-			https_post_request("d1", 0, 0, "time", mhz19b_co2,
+			get_time_string(time_string);
+			https_post_request("d1", 0, 0, time_string, mhz19b_co2,
 			bme680_values.temperature, bme680_values.pressure,
 			bme680_values.humidity);
 		}
