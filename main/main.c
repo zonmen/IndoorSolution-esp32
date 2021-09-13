@@ -1,3 +1,5 @@
+#include <leds_strip.h>
+#include <leds_strip.h>
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -10,6 +12,7 @@
 #include "bme680.h"
 #include "http_request.h"
 #include "bluetooth.h"
+#include "leds_strip.h"
 
 const char* TAG = "main";
 int flag_server_request = 0;
@@ -82,11 +85,15 @@ void app_main(void)
 
 	//start wifi
 	wifi_start();
+
 	//bluetooth
 	bluetooth_init();
 
 	//mhz19b
 	mhz19b_config();
+
+	//led strip
+	leds_strip_init();
 
 	//ds3231
 	ESP_ERROR_CHECK(i2cdev_init());
@@ -118,7 +125,8 @@ void app_main(void)
 		ESP_LOGI(TAG, "temperature = %d", (int)bme680_values.temperature);
 		ESP_LOGI(TAG, "pressure = %d", (int)bme680_values.pressure);
 		ESP_LOGI(TAG, "humidity = %d\n", (int)bme680_values.humidity);
-
+		//update led strip color
+		leds_strip_indication(mhz19b_co2);
 		//send data to server
 		if(flag_server_request == 1){
 			get_time_string(time_string);

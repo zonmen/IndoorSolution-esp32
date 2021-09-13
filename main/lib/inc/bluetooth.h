@@ -70,8 +70,10 @@ void write_data(char* probe_datatime, float longitude, float latitude,
 //set time between sending data to bluetooth client
 void bluetooth_command_send_time_set(char* command);
 
-//enable(1) = 1, turn on light co2 indication
-//disable(0) = 0, turn on just white light
+
+//value = 0, turn off led strip
+//value = 1, turn on light co2 indication
+//value = 2, turn on just white light
 void bluetooth_command_led_indication_enable(char* command);
 
 //enable(1)/disable(0) http request

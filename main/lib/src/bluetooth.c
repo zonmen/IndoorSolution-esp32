@@ -138,10 +138,10 @@ void bluetooth_command_led_indication_enable(char* command){
 	int command_data_place = 7;
 	int value = 0;
 	value = strtol((command + command_data_place * sizeof(char)), NULL, 10);
-	if(value != 0){
-		flag_led_indication = 1;
+	if(value == 0 || value == 1 || value == 2){
+		flag_led_indication = value;
 	} else{
-		flag_led_indication = 0;
+		flag_led_indication = 1;
 	}
 }
 
