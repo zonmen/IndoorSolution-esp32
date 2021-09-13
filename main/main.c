@@ -85,6 +85,9 @@ void app_main(void)
 	//bluetooth
 	bluetooth_init();
 
+	//mhz19b
+	mhz19b_config();
+
 	//ds3231
 	ESP_ERROR_CHECK(i2cdev_init());
 	i2c_dev_t dev;
@@ -97,7 +100,6 @@ void app_main(void)
 	struct timeval temp_time_timeval = { .tv_sec = temp_time_time_t };
 	settimeofday(&temp_time_timeval, NULL);
 
-
 	//bme680
 	bme680_t bme680_sensor;
 	memset(&bme680_sensor, 0, sizeof(bme680_t));
@@ -106,7 +108,6 @@ void app_main(void)
 	uint32_t bme680_duration;
 	bme680_get_measurement_duration(&bme680_sensor, &bme680_duration);
 	bme680_values_float_t bme680_values;
-
 
 	while(1){
 		//measure data from sensors
@@ -117,6 +118,7 @@ void app_main(void)
 		ESP_LOGI(TAG, "temperature = %d", (int)bme680_values.temperature);
 		ESP_LOGI(TAG, "pressure = %d", (int)bme680_values.pressure);
 		ESP_LOGI(TAG, "humidity = %d\n", (int)bme680_values.humidity);
+
 		//send data to server
 		if(flag_server_request == 1){
 			get_time_string(time_string);
@@ -124,6 +126,7 @@ void app_main(void)
 			bme680_values.temperature, bme680_values.pressure,
 			bme680_values.humidity);
 		}
+
 		//send data over bluetooth
 		if(flag_bl_send == 1){
 			get_time_string(time_string);
