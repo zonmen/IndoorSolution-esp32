@@ -6,12 +6,13 @@
 #include "driver/gpio.h"
 #include "wifi.h"
 #include "mhz19b.h"
+#include "ds3231.h"
+#include "bme680.h"
+#include "http_request.h"
 
 const char* TAG = "main";
+int flag_server_request = 0;
 
-#include "ds3231.h"
-
-#include "bme680.h"
 
 #define DS3231_I2C_SDA_PIN 19
 #define DS3231_I2C_SCL_PIN 21
@@ -79,6 +80,12 @@ void app_main(void)
 		ESP_LOGI(TAG, "temperature = %d", (int)bme680_values.temperature);
 		ESP_LOGI(TAG, "pressure = %d", (int)bme680_values.pressure);
 		ESP_LOGI(TAG, "humidity = %d\n", (int)bme680_values.humidity);
+		//send data to server
+		if(flag_server_request == 1){
+			https_post_request("d1", 0, 0, "time", mhz19b_co2,
+			bme680_values.temperature, bme680_values.pressure,
+			bme680_values.humidity);
+		}
 		//time delay between measuring
 		vTaskDelay(5000 / portTICK_PERIOD_MS);
 		}
