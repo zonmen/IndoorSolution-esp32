@@ -9,14 +9,16 @@
 
 const char* TAG = "main";
 
+#include "ds3231.h"
+
 #include "bme680.h"
 
-#define SDA_GPIO 19
-#define SCL_GPIO 21
+#define DS3231_I2C_SDA_PIN 19
+#define DS3231_I2C_SCL_PIN 21
 
 #define BME680_SDA_PIN 22
 #define BME680_SCL_PIN 23
-#define BME680_I2C_PORT 0
+#define I2C_PORT 0
 
 void bme680_get_data(bme680_t sensor, uint32_t duration, bme680_values_float_t* values){
 	if (bme680_force_measurement(&sensor) == ESP_OK) // STEP 1
@@ -35,18 +37,33 @@ void bme680_get_data(bme680_t sensor, uint32_t duration, bme680_values_float_t* 
 	}
 }
 
+
+
 void app_main(void)
 {
 	int mhz19b_co2 = 0;
+	char time_string[30];
 
 	//start wifi
 	wifi_start();
 
-	//bme680
+	//ds3231
 	ESP_ERROR_CHECK(i2cdev_init());
+	i2c_dev_t dev;
+	memset(&dev, 0, sizeof(i2c_dev_t));
+	ESP_ERROR_CHECK(ds3231_init_desc(&dev, I2C_PORT, DS3231_I2C_SDA_PIN, DS3231_I2C_SCL_PIN));
+	  //set time(GMT) to esp32 from ds3231(only after start)
+	struct tm ds3231_time_tm;
+	ds3231_get_time(&dev, &ds3231_time_tm);
+	time_t temp_time_time_t = mktime(&ds3231_time_tm);
+	struct timeval temp_time_timeval = { .tv_sec = temp_time_time_t };
+	settimeofday(&temp_time_timeval, NULL);
+
+
+	//bme680
 	bme680_t bme680_sensor;
 	memset(&bme680_sensor, 0, sizeof(bme680_t));
-	ESP_ERROR_CHECK(bme680_init_desc(&bme680_sensor, BME680_I2C_ADDR_1, BME680_I2C_PORT, BME680_SDA_PIN, BME680_SCL_PIN));
+	ESP_ERROR_CHECK(bme680_init_desc(&bme680_sensor, BME680_I2C_ADDR_1, I2C_PORT, BME680_SDA_PIN, BME680_SCL_PIN));
 	ESP_ERROR_CHECK(bme680_init_sensor(&bme680_sensor));
 	uint32_t bme680_duration;
 	bme680_get_measurement_duration(&bme680_sensor, &bme680_duration);
