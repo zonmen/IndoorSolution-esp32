@@ -101,7 +101,7 @@ void get_time_string(char* line){
 
 void app_main(void)
 {
-	int mhz19b_co2 = 0;
+	int mhz19b_co2 = 0, co2_sum = 0, co2_counter = 0;
 	char time_string[30];
 
 	//start wifi
@@ -151,6 +151,8 @@ void app_main(void)
 		if(flag_measuring == 1){
 		mhz19b_co2 = mhz19b_get_co2();
 		bme680_get_data(bme680_sensor, bme680_duration, &bme680_values);
+		co2_sum += mhz19b_co2;
+		co2_counter ++;
 		flag_measuring = 0;
 		//display data value
 		ESP_LOGI(TAG, "co2 = %d", mhz19b_co2);
@@ -163,9 +165,11 @@ void app_main(void)
 		//send data to server
 		if(flag_http_reuqest_send == 1 && flag_server_request == 1){
 			get_time_string(time_string);
-			https_post_request("d1", 0, 0, time_string, mhz19b_co2,
+			https_post_request("d1", 0, 0, time_string, (co2_sum / co2_counter),
 			bme680_values.temperature, bme680_values.pressure,
 			bme680_values.humidity);
+			co2_sum = 0;
+			co2_counter = 0;
 			flag_http_reuqest_send = 0;
 		}
 		//send data over bluetooth
