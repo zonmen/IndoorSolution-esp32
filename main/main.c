@@ -137,11 +137,11 @@ void app_main(void)
 
 	//Init and start timers for http request and to trigger measuring data
 	clock_init(&http_request_timer);
-	clock_set_time(&http_request_timer, 15 * 60);
+	clock_set_time(&http_request_timer, 15 * 60 * 1);
 	clock_start(&http_request_timer);
 
 	clock_init(&measuring_timer);
-	clock_set_time(&measuring_timer, 30);
+	clock_set_time(&measuring_timer, 30 * 1);
 	clock_start(&measuring_timer);
 
 	while(1){
@@ -162,7 +162,6 @@ void app_main(void)
 				get_time_string(time_string);
 				write_data(time_string, 0.0, 0.0, bme680_values.temperature,
 					bme680_values.pressure, bme680_values.humidity, mhz19b_co2, 0, 0);
-				flag_bl_connect = 0;
 			}
 		}
 		//update led strip color
