@@ -6,6 +6,7 @@
 #include "esp_log.h"
 #include <string.h>
 #include "driver/gpio.h"
+
 #include "wifi.h"
 #include "mhz19b.h"
 #include "ds3231.h"
@@ -13,10 +14,11 @@
 #include "http_request.h"
 #include "bluetooth.h"
 #include "leds_strip.h"
+#include "timers.h"
 
 const char* TAG = "main";
 int flag_server_request = 0;
-int flag_bl_send = 0;
+//int flag_bl_send = 0;
 int flag_led_indication = 1;
 
 
@@ -26,6 +28,26 @@ int flag_led_indication = 1;
 #define BME680_SDA_PIN 22
 #define BME680_SCL_PIN 23
 #define I2C_PORT 0
+
+int flag_bl_send = 0;
+int flag_http_reuqest_send = 0;
+int flag_measuring = 0;
+
+struct Timer bluetooth_timer = {
+		.timer_group = 0,
+		.timer_idx = 0,
+		.purpose = "bluetooth"
+};
+struct Timer http_request_timer = {
+		.timer_group = 0,
+		.timer_idx = 1,
+		.purpose = "http_request"
+};
+struct Timer measuring_timer = {
+		.timer_group = 1,
+		.timer_idx = 0,
+		.purpose = "measuring"
+};
 
 void bme680_get_data(bme680_t sensor, uint32_t duration, bme680_values_float_t* values){
 	if (bme680_force_measurement(&sensor) == ESP_OK) // STEP 1
@@ -75,7 +97,6 @@ void get_time_string(char* line){
 	strcat(temp_line, "Z");
 
 	strcpy(line, temp_line);
-	ESP_LOGI("get_time_string", "[APP] String %s",line);
 }
 
 void app_main(void)
@@ -116,25 +137,37 @@ void app_main(void)
 	bme680_get_measurement_duration(&bme680_sensor, &bme680_duration);
 	bme680_values_float_t bme680_values;
 
+	//start timers(except bluetooth)
+	clock_init(&http_request_timer);
+	clock_set_time(&http_request_timer, 15 * 60);
+	clock_start(&http_request_timer);
+
+	clock_init(&measuring_timer);
+	clock_set_time(&measuring_timer, 30);
+	clock_start(&measuring_timer);
+
 	while(1){
-		//measure data from sensors
+		//measure and display data from sensors
+		if(flag_measuring == 1){
 		mhz19b_co2 = mhz19b_get_co2();
 		bme680_get_data(bme680_sensor, bme680_duration, &bme680_values);
+		flag_measuring = 0;
 		//display data value
 		ESP_LOGI(TAG, "co2 = %d", mhz19b_co2);
 		ESP_LOGI(TAG, "temperature = %d", (int)bme680_values.temperature);
 		ESP_LOGI(TAG, "pressure = %d", (int)bme680_values.pressure);
 		ESP_LOGI(TAG, "humidity = %d\n", (int)bme680_values.humidity);
+		}
 		//update led strip color
 		leds_strip_indication(mhz19b_co2);
 		//send data to server
-		if(flag_server_request == 1){
+		if(flag_http_reuqest_send == 1 && flag_server_request == 1){
 			get_time_string(time_string);
 			https_post_request("d1", 0, 0, time_string, mhz19b_co2,
 			bme680_values.temperature, bme680_values.pressure,
 			bme680_values.humidity);
+			flag_http_reuqest_send = 0;
 		}
-
 		//send data over bluetooth
 		if(flag_bl_send == 1){
 			get_time_string(time_string);
@@ -143,6 +176,6 @@ void app_main(void)
 			flag_bl_send = 0;
 			}
 		//time delay between measuring
-		vTaskDelay(5000 / portTICK_PERIOD_MS);
+		vTaskDelay(100 / portTICK_PERIOD_MS);
 		}
 }

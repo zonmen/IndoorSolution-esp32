@@ -1,59 +1,7 @@
 #include "bluetooth.h"
 
 
-static bool IRAM_ATTR timer_callback_function(void *args)
-{
-	flag_bl_send = 1;
-	return pdTRUE;
-}
 
-void clock_init()
-{
-	int time_interval_sec = 5;
-	//set timer configuration
-	timer_config_t config = {
-	            .divider = TIMER_DIVIDER,
-	            .counter_dir = TIMER_COUNT_UP,
-	            .counter_en = TIMER_PAUSE,
-	            .alarm_en = TIMER_ALARM_EN,
-	            .auto_reload = TIMER_AUTORELOAD_EN,
-	        };
-	//init timer with configuration
-	timer_init(timer_group, timer_idx, &config);
-	//current timer value
-	timer_set_counter_value(timer_group, timer_idx, 0);
-	//set max timer value
-	timer_set_alarm_value(timer_group, timer_idx, time_interval_sec * TIMER_SCALE);
-	//enable interruption
-	timer_enable_intr(timer_group, timer_idx);
-	//set callback function for interruption
-	timer_isr_callback_add(timer_group, timer_idx, timer_callback_function, 0, 0);
-}
-
-void clock_start(){
-	timer_enable_intr(timer_group, timer_idx);
-	timer_start(timer_group, timer_idx);
-	//timer_deinit(timer_group, timer_idx);
-}
-
-void clock_stop(){
-	timer_pause(timer_group, timer_idx);
-	timer_disable_intr(timer_group, timer_idx);
-	//timer_deinit(timer_group, timer_idx);
-}
-
-void clock_set_time(int time_interval_sec){
-	timer_set_counter_value(timer_group, timer_idx, 0);
-	timer_set_alarm_value(timer_group, timer_idx, time_interval_sec * TIMER_SCALE);
-}
-
-int clock_get_time(){
-	uint64_t counter_value = 0;
-	int value_sec = 0;
-	timer_get_alarm_value(timer_group, timer_idx, &counter_value);
-	value_sec = (double) counter_value / TIMER_SCALE;
-	return value_sec;
-}
 
 void write_word_and_int(char* word, int value){
 //	char line[50];
@@ -125,12 +73,33 @@ void write_data(char* probe_datatime, float longitude, float latitude,
 }
 
 
-void bluetooth_command_send_time_set(char* command){
+void command_set_time_bluetooth_data(char* command){
 	int command_data_place = 11;
 	int time_interval = 0;
 	time_interval = strtol((command + command_data_place * sizeof(char)), NULL, 10);
-	if(time_interval != 0){
-		clock_set_time(time_interval);
+	if(time_interval >= 5){
+		ESP_LOGI("DEBUG_bluetooth.c", "bluetooth change time");
+		clock_set_time(&bluetooth_timer, time_interval);
+	}
+}
+
+void command_set_time_server_data(char* command){
+	int command_data_place = 10;
+	int time_interval = 0;
+	time_interval = strtol((command + command_data_place * sizeof(char)), NULL, 10);
+	if(time_interval >= 5){
+		ESP_LOGI("DEBUG_bluetooth.c", "server change time");
+		clock_set_time(&http_request_timer, time_interval);
+	}
+}
+//TIME_M=5
+void command_set_time_measure_data(char* command){
+	int command_data_place = 10;
+	int time_interval = 0;
+	time_interval = strtol((command + command_data_place * sizeof(char)), NULL, 10);
+	if(time_interval >= 5){
+		ESP_LOGI("DEBUG_bluetooth.c", "measuring change time");
+		clock_set_time(&measuring_timer, time_interval);
 	}
 }
 
@@ -156,14 +125,28 @@ void bluetooth_command_server_request_enable(char* command){
 	}
 }
 
+
+
 static void read_data(uint8_t* data_read, uint16_t length){
 //determine command
 	char* line = (char *)data_read;
 	// command = TIMEBAT (set time in seconds between measurements)
 	if(line[3] == 'T' && line[4] == 'I' && line[5] == 'M' && line[6] == 'E'
 				&& line[7] == 'B' && line[8] == 'A' && line[9] == 'T' && line[10] == '='){
-			printf("TIMEBAT");
-			bluetooth_command_send_time_set(line);
+			printf("TIMEBAT=");
+			command_set_time_bluetooth_data(line);
+		}
+		// command = TIME_S (time to send data to server
+		else if(line[3] == 'T' && line[4] == 'I' && line[5] == 'M' && line[6] == 'E'
+				&& line[7] == '_' && line[8] == 'S'){
+			printf("TIME_S=");
+			command_set_time_server_data(line);
+		}
+		// command = TIME_M(time between sensors measuring, min = 5 sec)
+		else if(line[3] == 'T' && line[4] == 'I' && line[5] == 'M' && line[6] == 'E'
+				&& line[7] == '_' && line[8] == 'M'){
+			printf("TIME_M=");
+			command_set_time_measure_data(line);
 		}
 		// command = LED on(1)/off(0)
 		else if(line[3] == 'L' && line[4] == 'E' && line[5] == 'D'){
@@ -219,11 +202,11 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         break;
     case ESP_SPP_CLOSE_EVT:			//when we disconnected (from console)
         ESP_LOGI(SPP_TAG, "ESP_SPP_CLOSE_EVT");
-        clock_stop();
+        clock_stop(&bluetooth_timer);
         break;
     case ESP_SPP_START_EVT:			//when start
         ESP_LOGI(SPP_TAG, "ESP_SPP_START_EVT, handle = %d", param->open.handle);
-        clock_init();
+        clock_init(&bluetooth_timer);
         break;
     case ESP_SPP_CL_INIT_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_CL_INIT_EVT");
@@ -241,7 +224,7 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
     case ESP_SPP_SRV_OPEN_EVT:			//when connect (with console)
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_OPEN_EVT, handle = %d", param->open.handle);
         write_handle = param->open.handle;
-        clock_start();
+        clock_start(&bluetooth_timer);
         break;
     case ESP_SPP_SRV_STOP_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_STOP_EVT");

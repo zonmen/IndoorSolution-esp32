@@ -17,13 +17,7 @@
 #include "esp_spp_api.h"
 #include "driver/gpio.h"
 //for timer
-#include "driver/timer.h"
-#define TIMER_DIVIDER         (16)  //  Hardware timer clock divider
-#define TIMER_SCALE           (APB_CLK_FREQ / TIMER_DIVIDER)  // convert counter value to seconds
-#define timer_group TIMER_GROUP_0
-#define timer_idx TIMER_0
-#include "time.h"
-#include "sys/time.h"
+#include "timers.h"
 
 #define SPP_TAG "esp32_spp_tag"
 #define SPP_SERVER_NAME "SPP_SERVER"
@@ -41,24 +35,14 @@ int write_handle;
 extern int flag_bl_send;
 extern int flag_led_indication;
 extern int flag_server_request;
+extern int flag_http_reuqest_send;
+extern int flag_measuring;
 
-//callback function for timer
-static bool IRAM_ATTR timer_callback_function(void *args);
+extern struct Timer bluetooth_timer;
+extern struct Timer http_request_timer;
+extern struct Timer measuring_timer;
 
-//initialize timer
-void clock_init();
 
-//start timer
-void clock_start();
-
-//stop timer
-void clock_stop();
-
-//set time to timer
-void clock_set_time(int time_interval_sec);
-
-//get time from timer
-int clock_get_time();
 
 //special format to send to bluetooth client
 void write_word_and_int(char* word, int value);
@@ -68,8 +52,11 @@ void write_data(char* probe_datatime, float longitude, float latitude,
 		int temperature, int presure, int humidity, int co2, int status, int response);
 
 //set time between sending data to bluetooth client
-void bluetooth_command_send_time_set(char* command);
+void command_set_time_bluetooth_data(char* command);
 
+void command_set_time_server_data(char* command);
+
+void command_set_time_measure_data(char* command);
 
 //value = 0, turn off led strip
 //value = 1, turn on light co2 indication
