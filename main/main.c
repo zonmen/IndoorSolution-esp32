@@ -17,7 +17,7 @@
 #include "timers.h"
 
 const char* TAG = "main";
-int flag_server_request_enable = 0;
+int flag_server_request_enable = 1;
 int flag_led_indication = 1;
 int flag_bl_connect = 0;
 int flag_http_reuqest_send = 0;
@@ -137,7 +137,7 @@ void app_main(void)
 
 	//Init and start timers for http request and to trigger measuring data
 	clock_init(&http_request_timer);
-	clock_set_time(&http_request_timer, 15 * 60 * 1);
+	clock_set_time(&http_request_timer, 30 * 60 * 1);
 	clock_start(&http_request_timer);
 
 	clock_init(&measuring_timer);
