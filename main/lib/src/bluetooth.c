@@ -88,17 +88,15 @@ void command_set_time_server_data(char* command){
 	int time_interval = 0;
 	time_interval = strtol((command + command_data_place * sizeof(char)), NULL, 10);
 	if(time_interval >= 5){
-		ESP_LOGI("DEBUG_bluetooth.c", "server change time");
 		clock_set_time(&http_request_timer, time_interval);
 	}
 }
 //TIME_M=5
 void command_set_time_measure_data(char* command){
-	int command_data_place = 10;
+	int command_data_place = 11;
 	int time_interval = 0;
 	time_interval = strtol((command + command_data_place * sizeof(char)), NULL, 10);
 	if(time_interval >= 5){
-		ESP_LOGI("DEBUG_bluetooth.c", "measuring change time");
 		clock_set_time(&measuring_timer, time_interval);
 	}
 }
@@ -119,9 +117,9 @@ void bluetooth_command_server_request_enable(char* command){
 	int value = 0;
 	value = strtol((command + command_data_place * sizeof(char)), NULL, 10);
 	if(value != 0){
-		flag_server_request = 1;
+		flag_server_request_enable = 1;
 	} else{
-		flag_server_request = 0;
+		flag_server_request_enable = 0;
 	}
 }
 
@@ -134,7 +132,7 @@ static void read_data(uint8_t* data_read, uint16_t length){
 	if(line[3] == 'T' && line[4] == 'I' && line[5] == 'M' && line[6] == 'E'
 				&& line[7] == 'B' && line[8] == 'A' && line[9] == 'T' && line[10] == '='){
 			printf("TIMEBAT=");
-			command_set_time_bluetooth_data(line);
+			command_set_time_measure_data(line);
 		}
 		// command = TIME_S (time to send data to server
 		else if(line[3] == 'T' && line[4] == 'I' && line[5] == 'M' && line[6] == 'E'
@@ -202,11 +200,12 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         break;
     case ESP_SPP_CLOSE_EVT:			//when we disconnected (from console)
         ESP_LOGI(SPP_TAG, "ESP_SPP_CLOSE_EVT");
-        clock_stop(&bluetooth_timer);
+//        clock_stop(&bluetooth_timer);
+        flag_bl_connect = 0;
         break;
     case ESP_SPP_START_EVT:			//when start
         ESP_LOGI(SPP_TAG, "ESP_SPP_START_EVT, handle = %d", param->open.handle);
-        clock_init(&bluetooth_timer);
+        //clock_init(&bluetooth_timer);
         break;
     case ESP_SPP_CL_INIT_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_CL_INIT_EVT");
@@ -224,7 +223,8 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
     case ESP_SPP_SRV_OPEN_EVT:			//when connect (with console)
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_OPEN_EVT, handle = %d", param->open.handle);
         write_handle = param->open.handle;
-        clock_start(&bluetooth_timer);
+        //clock_start(&bluetooth_timer);
+        flag_bl_connect = 1;
         break;
     case ESP_SPP_SRV_STOP_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_STOP_EVT");
@@ -294,10 +294,8 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 
 void bluetooth_init()
 {
-	//initialize global variables
+	//variable to send data over bluetooth
 	write_handle = 0;
-	flag_bl_send = 0;
-
 
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {

@@ -32,11 +32,11 @@ static const esp_spp_role_t role_slave = ESP_SPP_ROLE_SLAVE;
 
 
 int write_handle;
-extern int flag_bl_send;
 extern int flag_led_indication;
-extern int flag_server_request;
+extern int flag_server_request_enable;
 extern int flag_http_reuqest_send;
 extern int flag_measuring;
+extern int flag_bl_connect;
 
 extern struct Timer bluetooth_timer;
 extern struct Timer http_request_timer;
