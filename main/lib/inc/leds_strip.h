@@ -24,6 +24,10 @@
 #define LEDC_PIN_GREEN          (26)
 #define LEDC_PIN_BLUE	        (25)
 
+
+int red_portion;
+int green_portion;
+int blue_portion;
 extern int flag_led_indication;
 
 void leds_strip_init();

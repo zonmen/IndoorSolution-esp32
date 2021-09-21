@@ -2,6 +2,10 @@
 
 void leds_strip_init()
 {
+	//initialize color coefficient
+	red_portion = 1;
+	green_portion = 1;
+	blue_portion = 1;
     // Prepare and then apply the LEDC PWM timer configuration
     ledc_timer_config_t ledc_timer = {
         .speed_mode       = LEDC_MODE,
@@ -105,4 +109,15 @@ void leds_strip_indication(int co2){
 		ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_BLUE, LEDC_MAX_DUTY));
 		ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_BLUE));
 	}
+	//any color
+	if(flag_led_indication == 3){
+			ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_RED, LEDC_MAX_DUTY * ((float)red_portion / 100)) );
+			ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_RED));
+
+			ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_GREEN, LEDC_MAX_DUTY * ((float)green_portion / 100)));
+			ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_GREEN));
+
+			ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_BLUE, LEDC_MAX_DUTY  * ((float)blue_portion / 100)));
+			ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_BLUE));
+		}
 }

@@ -76,11 +76,6 @@ void clock_set_time(struct Timer* timer_t, int time_interval_sec){
 	timer_set_alarm_value(timer_t->timer_group, timer_t->timer_idx, time_interval_sec * TIMER_SCALE);
 }
 
-void clock_set_time_2(int timer_group, int timer_idx, int time_interval_sec){
-	timer_set_counter_value(timer_group, timer_idx, 0);
-	timer_set_alarm_value(timer_group, timer_idx, time_interval_sec * TIMER_SCALE);
-}
-
 int clock_get_time(struct Timer* timer_t){
 	uint64_t counter_value = 0;
 	int value_sec = 0;

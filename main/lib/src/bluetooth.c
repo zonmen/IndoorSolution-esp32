@@ -105,11 +105,28 @@ void bluetooth_command_led_indication_enable(char* command){
 	int command_data_place = 7;
 	int value = 0;
 	value = strtol((command + command_data_place * sizeof(char)), NULL, 10);
-	if(value == 0 || value == 1 || value == 2){
+	if(value == 0 || value == 1 || value == 2 || value == 3){
 		flag_led_indication = value;
 	} else{
 		flag_led_indication = 1;
 	}
+}
+
+void bluetooth_command_set_led_color(char* command){
+	int command_data_place = 10;
+	int value = 0;
+	value = strtol((command + command_data_place * sizeof(char)), &command, 10);
+	if(value >=0 && value <= 255){
+		red_portion = (((float)value)/255)*100;
+	}
+	value = strtol(command, &command, 10);
+	if(value >=0 && value <= 255){
+		green_portion = (((float)value)/255)*100;
+		}
+	value = strtol(command, &command, 10);
+	if(value >=0 && value <= 255){
+		blue_portion = (((float)value)/255)*100;
+		}
 }
 
 void bluetooth_command_server_request_enable(char* command){
@@ -150,6 +167,10 @@ static void read_data(uint8_t* data_read, uint16_t length){
 		else if(line[3] == 'L' && line[4] == 'E' && line[5] == 'D'){
 			printf("LED");
 			bluetooth_command_led_indication_enable(line);
+		// // command = COLOR=(1,2,3)
+		}else if(line[3] == 'C' && line[4] == 'O' && line[5] == 'L' && line[6] == 'O' && line[7] == 'R'){
+			printf("LED COLOR");
+			bluetooth_command_set_led_color(line);
 		}
 		// command = SERVER REQUEST on(1)/off(0)
 		else if(line[3] == 'S' && line[4] == 'E' && line[5] == 'R' && line[6] == 'V'

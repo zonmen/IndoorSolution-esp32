@@ -37,6 +37,10 @@ extern int flag_server_request_enable;
 extern int flag_http_reuqest_send;
 extern int flag_measuring;
 extern int flag_bl_connect;
+//led control
+extern int red_portion;
+extern int green_portion;
+extern int blue_portion;
 
 extern struct Timer bluetooth_timer;
 extern struct Timer http_request_timer;

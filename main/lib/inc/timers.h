@@ -43,9 +43,6 @@ void clock_stop(struct Timer* timer_t);
 
 void clock_set_time(struct Timer* timer_t, int time_interval_sec);
 
-//debug f
-void clock_set_time_2(int timer_group, int timer_idx, int time_interval_sec);
-
 int clock_get_time(struct Timer* timer_t);
 
 #endif
