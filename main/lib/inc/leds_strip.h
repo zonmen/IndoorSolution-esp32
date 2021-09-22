@@ -29,6 +29,7 @@ int red_portion;
 int green_portion;
 int blue_portion;
 extern int flag_led_indication;
+extern int flag_blink;
 
 void leds_strip_init();
 

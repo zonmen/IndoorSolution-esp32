@@ -5,12 +5,14 @@ esp_err_t _http_event_handle(esp_http_client_event_t *evt)
     switch(evt->event_id) {
         case HTTP_EVENT_ERROR:
             ESP_LOGI("http", "HTTP_EVENT_ERROR");
+            flag_status_http_sent = -1;
             break;
         case HTTP_EVENT_ON_CONNECTED:
             ESP_LOGI("http", "HTTP_EVENT_ON_CONNECTED");
             break;
         case HTTP_EVENT_HEADER_SENT:
             ESP_LOGI("http", "HTTP_EVENT_HEADER_SENT");
+            flag_status_http_sent = 1;
             break;
         case HTTP_EVENT_ON_HEADER:
             ESP_LOGI("http", "HTTP_EVENT_ON_HEADER");

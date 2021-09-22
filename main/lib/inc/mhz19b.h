@@ -19,11 +19,14 @@
 #define ECHO_TEST_CTS  (UART_PIN_NO_CHANGE)
 #define BUF_SIZE (1024)
 
+extern int flag_status_mhz19b;
 
-void mhz19b_config();
+int mhz19b_config();
+
+int mhz19b_detect();
 
 int mhz19b_get_co2();
 
-void mhz19b_auto_callibration();
+void mhz19b_set_auto_callibration(int value);
 
 #endif

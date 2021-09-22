@@ -83,9 +83,11 @@ void wifi_init(void)
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI("", "connected to ap SSID:%s password:%s",
         		WIFI_SSID, WIFI_PASS);
+        flag_status_wifi_connected = 1;
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGI("", "Failed to connect to SSID:%s, password:%s",
         		WIFI_SSID, WIFI_PASS);
+        flag_status_wifi_connected = -1;
     } else {
         ESP_LOGE("", "UNEXPECTED EVENT");
     }

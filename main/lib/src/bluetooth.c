@@ -82,7 +82,7 @@ void command_set_time_bluetooth_data(char* command){
 		clock_set_time(&bluetooth_timer, time_interval);
 	}
 }
-
+//AT+TIME_S=
 void command_set_time_server_data(char* command){
 	int command_data_place = 10;
 	int time_interval = 0;
@@ -91,7 +91,7 @@ void command_set_time_server_data(char* command){
 		clock_set_time(&http_request_timer, time_interval);
 	}
 }
-//TIME_M=5
+//AT+TIMEBAT=
 void command_set_time_measure_data(char* command){
 	int command_data_place = 11;
 	int time_interval = 0;

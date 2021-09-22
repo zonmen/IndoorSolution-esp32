@@ -18,6 +18,8 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 
+extern int flag_status_http_sent;
+
 esp_err_t _http_event_handle(esp_http_client_event_t *evt);
 
 void https_post_request(char* name, float latitude, float longitude, char* probe_datatime, int co, int temperature, int presure, int humidity);

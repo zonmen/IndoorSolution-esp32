@@ -65,7 +65,7 @@ void leds_strip_indication(int co2){
 
 	if(flag_led_indication == 1)
 	{
-	if(co2 < 1000 && co2 > 0 && co2 < 5000){
+	if(co2 < 1000 && co2 > 400 && co2 < 5000){
 		//light green
 		 ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_GREEN, LEDC_MAX_DUTY));
 		 ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_GREEN));
@@ -96,6 +96,31 @@ void leds_strip_indication(int co2){
 		if(co2 > 3000 && co2 <= 5000){
 			ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_RED, LEDC_MAX_DUTY));
 			ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_RED));
+		}
+		//sensor is not ready - light blue
+		else {
+			ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_BLUE, LEDC_MAX_DUTY  * 0.78));
+			ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_BLUE));
+//			if(flag_blink <= 5){
+//				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_RED, LEDC_MAX_DUTY * 0.2 ));
+//				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_RED));
+//
+//				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_GREEN, LEDC_MAX_DUTY * 0.27));
+//				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_GREEN));
+//
+//				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_BLUE, LEDC_MAX_DUTY  * 0.78));
+//				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_BLUE));
+//			} else{
+//				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_RED, LEDC_MAX_DUTY * 0.2 ));
+//				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_RED));
+//
+//				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_GREEN, LEDC_MAX_DUTY * 0.27));
+//				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_GREEN));
+//
+//				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_BLUE, LEDC_MAX_DUTY  * 0.51));
+//				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_BLUE));
+//				if(flag_blink == 10) flag_blink = 0;
+//			}
 		}
 	}
 
