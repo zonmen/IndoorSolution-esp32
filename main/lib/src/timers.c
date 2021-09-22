@@ -72,8 +72,9 @@ void clock_stop(struct Timer* timer_t){
 }
 
 void clock_set_time(struct Timer* timer_t, int time_interval_sec){
+	uint64_t time = (uint64_t) time_interval_sec * (uint64_t) TIMER_SCALE;
 	timer_set_counter_value(timer_t->timer_group, timer_t->timer_idx, 0);
-	timer_set_alarm_value(timer_t->timer_group, timer_t->timer_idx, time_interval_sec * TIMER_SCALE);
+	timer_set_alarm_value(timer_t->timer_group, timer_t->timer_idx, time);
 }
 
 int clock_get_time(struct Timer* timer_t){
