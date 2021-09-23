@@ -55,9 +55,6 @@ void write_word_and_int(char* word, int value);
 void write_data(char* probe_datatime, float longitude, float latitude,
 		int temperature, int presure, int humidity, int co2, int status, int response);
 
-//set time between sending data to bluetooth client
-void command_set_time_bluetooth_data(char* command);
-
 void command_set_time_server_data(char* command);
 
 void command_set_time_measure_data(char* command);

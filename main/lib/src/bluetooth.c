@@ -73,15 +73,6 @@ void write_data(char* probe_datatime, float longitude, float latitude,
 }
 
 
-void command_set_time_bluetooth_data(char* command){
-	int command_data_place = 11;
-	int time_interval = 0;
-	time_interval = strtol((command + command_data_place * sizeof(char)), NULL, 10);
-	if(time_interval >= 5){
-		ESP_LOGI("DEBUG_bluetooth.c", "bluetooth change time");
-		clock_set_time(&bluetooth_timer, time_interval);
-	}
-}
 //AT+TIME_S=
 void command_set_time_server_data(char* command){
 	int command_data_place = 10;
@@ -156,12 +147,6 @@ static void read_data(uint8_t* data_read, uint16_t length){
 				&& line[7] == '_' && line[8] == 'S'){
 			printf("TIME_S=");
 			command_set_time_server_data(line);
-		}
-		// command = TIME_M(time between sensors measuring, min = 5 sec)
-		else if(line[3] == 'T' && line[4] == 'I' && line[5] == 'M' && line[6] == 'E'
-				&& line[7] == '_' && line[8] == 'M'){
-			printf("TIME_M=");
-			command_set_time_measure_data(line);
 		}
 		// command = LED on(1)/off(0)
 		else if(line[3] == 'L' && line[4] == 'E' && line[5] == 'D'){

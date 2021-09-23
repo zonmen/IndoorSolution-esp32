@@ -38,11 +38,6 @@ int flag_status_ds3231 = 0;
 #define BME680_SCL_PIN 23
 #define I2C_PORT 0
 
-struct Timer bluetooth_timer = {
-		.timer_group = 0,
-		.timer_idx = 0,
-		.purpose = "bluetooth"
-};
 struct Timer http_request_timer = {
 		.timer_group = 1,
 		.timer_idx = 0,
