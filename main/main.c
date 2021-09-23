@@ -23,7 +23,7 @@ int flag_bl_connect = 0;
 int flag_http_reuqest_send = 0;
 int flag_measuring = 0;
 int flag_bl_send = 0;
-int flag_blink = 0;
+
 //status
 int flag_status_wifi_connected = 0;
 int flag_status_http_sent = 0;

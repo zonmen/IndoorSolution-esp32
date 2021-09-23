@@ -28,6 +28,7 @@
 int red_portion;
 int green_portion;
 int blue_portion;
+int flag_blink;
 extern int flag_led_indication;
 extern int flag_blink;
 
