@@ -67,6 +67,9 @@ void bluetooth_command_led_indication_enable(char* command);
 //enable(1)/disable(0) http request
 void bluetooth_command_server_request_enable(char* command);
 
+//restart esp32 module
+void bluetooth_command_restart(char* command);
+
 //read command from client
 static void read_data(uint8_t* data_read, uint16_t length);
 

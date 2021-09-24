@@ -23,7 +23,6 @@ int flag_bl_connect = 0;
 int flag_http_reuqest_send = 0;
 int flag_measuring = 0;
 int flag_bl_send = 0;
-
 //status
 int flag_status_wifi_connected = 0;
 int flag_status_http_sent = 0;
@@ -180,7 +179,7 @@ void app_main(void)
 	clock_start(&http_request_timer);
 
 	clock_init(&measuring_timer);
-	clock_set_time(&measuring_timer, 30 * 1);
+	clock_set_time(&measuring_timer, 10 * 1);
 	clock_start(&measuring_timer);
 
 	while(1){
@@ -192,7 +191,7 @@ void app_main(void)
 				co2_counter ++;
 			}else{
 				mhz19b_co2 = -100;
-				if( mhz19b_config() != 1 ){
+				if( mhz19b_detect() != 1 ){
 					ESP_LOGE("MAIN", "Sensor MHZ19B is not detected");
 				} else ESP_LOGI("MAIN", "Sensor MHZ19B is OK");
 			}

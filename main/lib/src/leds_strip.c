@@ -101,7 +101,7 @@ void leds_strip_indication(int co2){
 		//sensor is not ready - light blue
 		else {
 			flag_blink++;
-			if(flag_blink <= 10){
+			if(flag_blink <= 8){
 				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_RED, LEDC_MAX_DUTY * 0.2 ));
 				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_RED));
 
@@ -119,7 +119,7 @@ void leds_strip_indication(int co2){
 
 				ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL_BLUE, LEDC_MAX_DUTY  * 0.51));
 				ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL_BLUE));
-				if(flag_blink == 20) flag_blink = 0;
+				if(flag_blink == 16) flag_blink = 0;
 			}
 		}
 	}

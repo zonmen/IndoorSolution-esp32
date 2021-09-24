@@ -131,7 +131,9 @@ void bluetooth_command_server_request_enable(char* command){
 	}
 }
 
-
+void bluetooth_command_restart(char* command){
+	esp_restart();
+}
 
 static void read_data(uint8_t* data_read, uint16_t length){
 //determine command
@@ -162,6 +164,12 @@ static void read_data(uint8_t* data_read, uint16_t length){
 				&& line[7] == 'E' && line[8] == 'R'){
 			printf("SERVER");
 			bluetooth_command_server_request_enable(line);
+		}
+		//command = RESTART esp32 module
+		else if(line[3] == 'R' && line[4] == 'E' && line[5] == 'S' && line[6] == 'T'
+				&& line[7] == 'A' && line[8] == 'R' && line[9] == 'T'){
+			printf("RESTART");
+			bluetooth_command_restart(line);
 		}
 		// command = CONNECT (return id and phone number)
 		else if(line[3] == 'C' && line[4] == 'O' && line[5] == 'N' && line[6] == 'N'
