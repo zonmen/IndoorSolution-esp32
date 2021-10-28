@@ -5,7 +5,7 @@
 - Wifi
 - Http Post request
 - Bluetooth classic.
-Датчики: 
+<br>Датчики: 
 - MHZ19B(UART)
 - BME680(I2C)
 - DS3231(I2C)
