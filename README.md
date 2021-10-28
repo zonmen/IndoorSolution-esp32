@@ -4,8 +4,10 @@
 <br>В проекте используются такие технологии:
 - Wifi
 - Http Post request
-- Bluetooth classic.
-<br>Датчики: 
+- Bluetooth classic
+<br>
+Датчики: 
+
 - MHZ19B(UART)
 - BME680(I2C)
 - DS3231(I2C)
