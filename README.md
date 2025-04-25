@@ -16,3 +16,6 @@ Sensors:<br>
 ## Presentation
 - ✏️ [Starting idea](https://docs.google.com/presentation/d/1VMZPYE34D4c1-ZEpLRXhgN7rVO6kNnvRJ75agNbesAc/edit?usp=sharing)
 - ✏️ [Project MVP](https://docs.google.com/presentation/d/1v0FdQ0JoruEK3JPpU4IVjjF-b7qXWhSjoi4uphF-Yzk/edit?usp=sharing)
+
+ 
+![image](https://github.com/user-attachments/assets/0efdf0df-c0a6-470a-9a46-1b9ef7a84e99)
